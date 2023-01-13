@@ -6,48 +6,52 @@ node(smartphone8,[android, gcc, make], 8, []).
     availability(smartphone8, 0.9). % the availability of the node
     profit(smartphone8, 10). % the profit that the infrastructure provider gets for providing a node
     location(smartphone8, eu). % the location of the node
+    security(smartphone8, [antimalware, encryptedStorage]). % the security of the node
 node(smartphone9,[android, gcc, make], 8, [vrViewer]).
     energyProfile(smartphone9, 0.99).
     availability(smartphone9, 0.95).
     profit(smartphone9, 4).
     location(smartphone9, us).
+    security(smartphone9, [antimalware]).
 node(accesspoint9,[android, gcc, make], 12, [vrViewer]).
     energyProfile(accesspoint9, 0.8).
     availability(accesspoint9, 0.9999).
     profit(accesspoint9, 0).
-    location(smartphone8, eu).
+    location(accesspoint9, eu).
+    security(accesspoint9, [wpa2, firewall, antimalware]).
 
 link(accesspoint9, smartphone9, 10, 15).
 link(smartphone9, accesspoint9, 10, 15).
 link(accesspoint9, smartphone8, 10, 15).
 link(smartphone8, accesspoint9, 10, 15).
 
-% request(RequestId, SourceNodeId, TotHardware, MaxLatency, MinBandwidth, MaxNodes, Locations).
-request(req42, accesspoint9, 5, 25, 10, 1, [eu,us]).
+% request(RequestId, SourceNodeId, TotHardware, MaxLatency, MinBandwidth, MaxNodes, Security, Locations).
+request(req42, accesspoint9, (5, 200, 1, 2, [antimalware], [eu,us])).
 
 findCuts(RequestId, Continua) :-
     setof((Nodes,HW), fogcutter(RequestId, Nodes, HW), Continua).
 
 fogcutter(RequestId, Nodes, Params) :-
-    request(RequestId, N, Hardware, MaxLatency, MinBandwidth, MaxNodes, Locs),
+    request(RequestId, N, ReqsSpecs),
     node(N,_,H,_),
-    infrastructure(N, H, Hardware, MaxLatency, MinBandwidth, MaxNodes, Locs, [N], Nodes, Params).
+    infrastructure(N, H, ReqsSpecs, [N], Nodes, Params).
 
-infrastructure(_, H, MissingHW, _, _, _, _, L, NewL, (H,R,A,P)) :- 
+infrastructure(_, H, (MissingHW, _, _, _, _), L, NewL, (H,R,A,P)) :- 
     MissingHW =< 0, sort(L,NewL),
     renewableScore(NewL, R),
     availableCut(NewL, A),
     cutProfit(NewL, P).
-infrastructure(N, CurrHW, MissingHW, MaxLat, MinBW, MaxNodes, Locs, Nodes, NewNodes, Params) :-
-    goodNeighbour(N,M,H,MaxLat,MinBW,Locs), \+ member(M,Nodes),
+infrastructure(N, CurrHW,(MissingHW, MaxLat, MinBW, MaxNodes, Security, Locs), Nodes, NewNodes, Params) :-
+    goodNeighbour(N,M,H,MaxLat,MinBW,Security,Locs), \+ member(M,Nodes),
     NewMissingHW is MissingHW - H,
     NewCurrHW is CurrHW + H,
     MaxNodes > 0, NewMax is MaxNodes - 1, 
-    infrastructure(N, NewCurrHW, NewMissingHW, MaxLat, MinBW, NewMax, Locs, [M|Nodes], NewNodes, Params).
+    infrastructure(N, NewCurrHW, (NewMissingHW, MaxLat, MinBW, NewMax, Security, Locs), [M|Nodes], NewNodes, Params).
 
-goodNeighbour(N, M, H, MaxLat, MinBW, Locs) :- 
+goodNeighbour(N, M, H, MaxLat, MinBW, SecReqs, Locs) :- 
     node(M,_,H,_), dif(N,M),
     location(M, Loc), member(Loc, Locs),
+    security(M, SecCaps), subset(SecReqs, SecCaps),
     link(N,M,LNM,BNM), LNM < MaxLat, BNM > MinBW,
     link(M,N,LMN,BMN), LMN < MaxLat, BMN > MinBW.
 

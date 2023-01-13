@@ -1,22 +1,15 @@
 :- consult('infra.pl').
 
-% node(smartphone8,[android, gcc, make], 8, []).
-% node(smartphone9,[android, gcc, make], 8, [vrViewer]).
-
-% link(accesspoint9, smartphone9, 10, 15).
-% link(smartphone9, accesspoint9, 10, 15).
-% link(accesspoint9, smartphone8, 10, 15).
-% link(smartphone8, accesspoint9, 10, 15).
-
 % request(RequestId, SourceNodeId, TotHardware, MaxLatency, MinBandwidth, MaxNodes).
-% TODO: 
-%   - Energy consumption (PLANET) 
+% DONE: 
 %   - Energy sources (PLANET)
-%   - Variations with probabilities (PEOPLE)
-%   - Cost for the provider (PROFIT)
+%   - Profit for the provider (PROFIT)
 %   - Security (PEOPLE)
 %   - Availability (PEOPLE)
 %   - Geographical Location (PEOPLE)
+% TODO: 
+%   - Energy consumption (PLANET) (makes sense?)
+%   - Variations with probabilities (PEOPLE) check whether/how fogcutter works in Problog
 % request(n45, small, .95).
 % How to compose different Cloud-IoT "cuts"? (Subset of the union)
 % How to pick the "best" cut?
