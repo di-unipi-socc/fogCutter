@@ -36,17 +36,16 @@ fogcutter(RequestId, Nodes, Params) :-
     node(N,_,H,_),
     infrastructure(N, H, ReqsSpecs, [N], Nodes, Params).
 
-infrastructure(_, H, (MissingHW, _, _, _, _), L, NewL, (H,R,A,P)) :- 
-    MissingHW =< 0, sort(L,NewL),
-    renewableScore(NewL, R),
-    availableCut(NewL, A),
+infrastructure(_, H, (ReqHW, _, _, _, _), L, NewL, (H,R,A,P)) :- 
+    H >= ReqHW, sort(L,NewL),
+    renewableCut(NewL, R), 
+    availableCut(NewL, A), 
     cutProfit(NewL, P).
-infrastructure(N, CurrHW,(MissingHW, MaxLat, MinBW, MaxNodes, Security, Locs), Nodes, NewNodes, Params) :-
+infrastructure(N, CurrHW,(HW, MaxLat, MinBW, MaxNodes, Security, Locs), Nodes, NewNodes, Params) :-
     goodNeighbour(N,M,H,MaxLat,MinBW,Security,Locs), \+ member(M,Nodes),
-    NewMissingHW is MissingHW - H,
     NewCurrHW is CurrHW + H,
     MaxNodes > 0, NewMax is MaxNodes - 1, 
-    infrastructure(N, NewCurrHW, (NewMissingHW, MaxLat, MinBW, NewMax, Security, Locs), [M|Nodes], NewNodes, Params).
+    infrastructure(N, NewCurrHW, (HW, MaxLat, MinBW, NewMax, Security, Locs), [M|Nodes], NewNodes, Params).
 
 goodNeighbour(N, M, H, MaxLat, MinBW, SecReqs, Locs) :- 
     node(M,_,H,_), dif(N,M),
@@ -67,9 +66,9 @@ availableCut([N|Ns], A) :-
     availability(N, A2),
     A is A1 * A2.
 
-renewableScore([], 1).
-renewableScore([N|Ns], GScore) :-
-    renewableScore(Ns, GScore1),
+renewableCu([], 1).
+renewableCu([N|Ns], GScore) :-
+    renewableCut(Ns, GScore1),
     energyProfile(N, E),
     GScore is GScore1 * E.
 
