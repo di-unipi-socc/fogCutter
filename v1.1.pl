@@ -66,9 +66,11 @@ availableCut([N|Ns], A) :-
     availability(N, A2),
     A is A1 * A2.
 
-renewableCu([], 1).
-renewableCu([N|Ns], GScore) :-
+renewableCut([], 1).
+renewableCut([N|Ns], GScore) :-
     renewableCut(Ns, GScore1),
     energyProfile(N, E),
     GScore is GScore1 * E.
 
+
+R = [([accesspoint9], 12, 0.8, 0.9999, 0), ([accesspoint9, smartphone8], 20, 0.6400000000000001, 0.89991, 10), ([accesspoint9, smartphone9], 20, 0.792, 0.949905, 4)].
