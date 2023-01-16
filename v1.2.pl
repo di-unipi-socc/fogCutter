@@ -34,18 +34,30 @@ link(accesspoint9, smartphone8, 10, 15).
 link(smartphone8, accesspoint9, 10, 15).
 
 % request(RequestId, SourceNodeId, TotHardware, MaxLatency, MinBandwidth, MaxNodes, Security, Locations).
-% TODO: Add thresholds, e.g. [(sustainability, 0.5), (availability, 0.99)]
 % TODO: consider suggesting a cut that is not the best one, but that is "good enough", return all results when it is not possible to find a best one.
-request(req42, accesspoint9, (5, 200, 1, 2, [antimalware], [eu,us]), [sustainability,availability]).
+request(req42, accesspoint9, (5, 200, 1, 2, [antimalware], [eu,us]), [(sustainability,0.5),(availability, 0.8)]).
 
-findCuts(RequestId, Cuts) :-
-    setof((Cut, Scores), fogcutter(RequestId, Cut, Scores), Cuts).
+% Returns the cut with the highest profit for the provider.
+bestCut(RequestId, Cuts, BestCut) :- 
+    fogCutter(RequestId, Cuts),
+    cutsWithProfit(Cuts, PCs),
+    sort(PCs, Tmp), reverse(Tmp,  [BestCut|_]).
 
-fogcutter(RequestId, Cut, Scores) :-
+cutsWithProfit([], []).
+cutsWithProfit([(C,Scores)|Cs], [(P,C)|PCs]) :-
+    member((profit,P), Scores),
+    cutsWithProfit(Cs, PCs).
+
+fogCutter(RequestId, Cuts) :-
+    request(RequestId, _, _, Targets),
+    setof((Cut, Scores), (fogCutter(RequestId, Targets, Cut, Scores), suitableCut(Targets,Scores)), Cuts).
+
+fogCutter(RequestId, Targets, Cut, Scores) :-
     request(RequestId, N, ReqsSpecs, Params),
     node(N), hardwareCaps(N, H),
     infrastructureCut(N, H, ReqsSpecs, [N], Nodes), sort(Nodes,Cut),
-    cutScores(Cut, Params, Scores). 
+    append(Params, [(profit,0)], NewParams), % params from the infrastructure provider
+    cutScores(Cut, NewParams, Scores).
 
 infrastructureCut(_, H, (ReqHW, _, _, MaxNodes, _), Cut, Cut) :- 
     H >= ReqHW, length(Cut, L), L =< MaxNodes.
@@ -67,31 +79,32 @@ cutScores(C,Params,Eval) :-
     initialize(Params,InitEval),
     cutScores(C,Params,InitEval,Eval).
 
-initialize([],[]).
 initialize([P|Ps],[E|Es]) :-
     initializeOne(P,E),
     initialize(Ps,Es).
+initialize([],[]).
 
-initializeOne(availability,1).
-initializeOne(profit,0).
-initializeOne(sustainability,1).
+initializeOne((availability,_),(availability,1)).
+initializeOne((sustainability,_),(sustainability,1)).
+initializeOne((profit,_),(profit,0)).
 
-cutScores([],_,E,E).
 cutScores([N|Ns],Params,Eval,NewEval):-
     updateEval(N,Params,Eval,TempEval),
     cutScores(Ns,Params,TempEval,NewEval).
+cutScores([],_,E,E).
 
-updateEval(_,[],E,E).
 updateEval(N,[P|Ps],[E|Es],[NewE|NewEs]) :-
     updateOne(N,P,E,NewE),
     updateEval(N,Ps,Es,NewEs).
+updateEval(_,[],E,E).
 
-updateOne(N,availability,E,NewE) :-
-    availability(N,X),
-    NewE is E*X.
-updateOne(N,sustainability,E,NewE) :-
-    energyProfile(N,X),
-    NewE is E*X.
-updateOne(N,profit,E,NewE) :-
-    profit(N,X),
-    NewE is E+X.
+updateOne(N,(availability,_),(availability,E),(availability,NewE)) :-
+    availability(N,X), NewE is E*X.
+updateOne(N,(sustainability,_),(sustainability,E),(sustainability,NewE)) :-
+    energyProfile(N,X), NewE is E*X.
+updateOne(N,(profit,_),(profit,E),(profit,NewE)) :-
+    profit(N,X), NewE is E+X.
+
+suitableCut([(P,T)|Ts], Scores) :-
+   member((P, S), Scores), S >= T, suitableCut(Ts, Scores).
+suitableCut([], _).
