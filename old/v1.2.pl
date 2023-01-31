@@ -1,6 +1,5 @@
-% node(NodeId, SWCaps, HWCaps, IoTCaps).
 node(smartphone8).
-    hardwareCaps(smartphone8, 8). % the hardware capabilities of the node 
+    vmType(smartphone8, 8). % the hardware capabilities of the node 
     softwareCaps(smartphone8, [android, gcc, make]). % the software capabilities of the node
     iotCaps(smartphone8, [temperature, humidity, light]). % the IoT capabilities of the node (e.g. sensors, actuators
     energyProfile(smartphone8, 0.8). % a number between 0 and 1 that indicates how much energy for the node is provided by renewable sources
@@ -9,7 +8,9 @@ node(smartphone8).
     location(smartphone8, eu). % the location of the node
     security(smartphone8, [antimalware, encryptedStorage]). % the security of the node
 node(smartphone9).
-    hardwareCaps(smartphone9, 8).
+    vmType(smartphone9, 8). 
+    vmType(smartphone9, 1). 
+    vmType(smartphone9, 2). 
     softwareCaps(smartphone9, [android, gcc, make]).
     iotCaps(smartphone9, [temperature, humidity, light]).
     energyProfile(smartphone9, 0.99).
@@ -18,7 +19,7 @@ node(smartphone9).
     location(smartphone9, us).
     security(smartphone9, [antimalware]).
 node(accesspoint9).
-    hardwareCaps(accesspoint9, 12).
+    vmType(accesspoint9, 12).
     softwareCaps(accesspoint9, [android, gcc, make]).
     iotCaps(accesspoint9, [vrViewer, humidity, light]).
     energyProfile(accesspoint9, 0.8).
@@ -35,16 +36,16 @@ link(smartphone8, accesspoint9, 10, 15).
 
 % request(RequestId, SourceNodeId, TotHardware, MaxLatency, MinBandwidth, MaxNodes, Security, Locations).
 % TODO: consider suggesting a cut that is not the best one, but that is "good enough", return all results when it is not possible to find a best one.
-request(req42, accesspoint9, (5, 200, 1, 2, [antimalware], [eu,us]), [(sustainability,0.5),(availability, 0.8)]).
+request(req42, accesspoint9, (5, 200, 1, 2, [antimalware], [eu,us]), [(sustainability,0.6),(availability, 0.8)]).
 
 % Returns the cut with the highest profit for the provider.
-bestCut(RequestId, Cuts, BestCut) :- 
+bestCut(RequestId, BestCut) :- 
     fogCutter(RequestId, Cuts),
-    cutsWithProfit(Cuts, PCs),
-    sort(PCs, Tmp), reverse(Tmp,  [BestCut|_]).
+    cutsWithProfit(Cuts, PCs), % TODO: change profit into rank so to linearly combine all metrics into a single value :-)
+    sort(PCs, Tmp), reverse(Tmp,  [(_,BestCut,_)|_]).
 
 cutsWithProfit([], []).
-cutsWithProfit([(C,Scores)|Cs], [(P,C)|PCs]) :-
+cutsWithProfit([(C,Scores)|Cs], [(P,C,Scores)|PCs]) :-
     member((profit,P), Scores),
     cutsWithProfit(Cs, PCs).
 
@@ -54,7 +55,7 @@ fogCutter(RequestId, Cuts) :-
 
 fogCutter(RequestId, Targets, Cut, Scores) :-
     request(RequestId, N, ReqsSpecs, Params),
-    node(N), hardwareCaps(N, H),
+    node(N), vmType(N, H),
     infrastructureCut(N, H, ReqsSpecs, [N], Nodes), sort(Nodes,Cut),
     append(Params, [(profit,0)], NewParams), % params from the infrastructure provider
     cutScores(Cut, NewParams, Scores).
@@ -69,7 +70,7 @@ infrastructureCut(N, CurrHW, ReqsSpecs, Cut, NewCut) :-
 
 goodNeighbour(N, M, H, MaxLat, MinBW, SecReqs, Locs) :- 
     node(M), dif(N,M),
-    location(M, Loc), member(Loc, Locs), hardwareCaps(M, H),
+    location(M, Loc), member(Loc, Locs), vmType(M, H),
     security(M, SecCaps), subset(SecReqs, SecCaps),
     link(N,M,LNM,BNM), LNM < MaxLat, BNM > MinBW,
     link(M,N,LMN,BMN), LMN < MaxLat, BMN > MinBW.
