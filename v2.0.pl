@@ -2,13 +2,13 @@
 :- use_module(library(random)).
 
 fogCutter(RequestId, BestPortion) :- 
-    setof(C, portionWithProfit(RequestId, C), Portions),
+    setof(C, portion(RequestId, C), Portions),
     bestPortion(Portions, BestPortion).
 
 bestPortion(L, (P,Best)) :- 
     member((P,Best), L), \+ (member((P1,B1),L), dif(Best,B1), P < P1). %sort(L, Tmp), reverse(Tmp, [(P,Best)|_]).
 
-portionWithProfit(RequestId, (Profit, Portion)) :-
+portion(RequestId, (Profit, Portion)) :-
     request(RequestId, N, MaxNodes, Reqs),      
     splitRequests(Reqs, NodeReqs, LinkReqs, GlobalReqs),
     portion(N, MaxNodes, NodeReqs, LinkReqs, GlobalReqs, [N], Portion),
