@@ -1,11 +1,6 @@
 :- discontiguous aggregatedListValue/3. 
 :- use_module(library(random)).
 
-start :- 
-    once(generateLinks()),
-    fogCutter(req42, BestPortion),
-    write(BestPortion).
-
 fogCutter(RequestId, BestPortion) :- 
     setof(C, portionWithProfit(RequestId, C), Portions),
     bestPortion(Portions, BestPortion).
