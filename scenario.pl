@@ -1,6 +1,12 @@
 %%%%%%% Example of request %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % request( RequestId, SourceNodeId, MaxNodes, HardReqs, SoftReqs)
-request(req42, ap5, 7, [(hardware,20), (latency,150),(bandwidth,10),(security,[antimalware]), (location,([eu,us])), (availability, 0.8), (sustainability, 0.0)]).
+
+% Q1
+% request(req42, ap3, 3, [(hardware,20), (latency,150), (bandwidth,10)]).
+% Q2
+% request(req42, ap3, 3, [(hardware,20), (latency,150),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,([eu]))]).
+% Q3
+% request(req42, ap3, 3, [(hardware,20), (latency,150),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,([eu])), (availability, 0.85), (sustainability, 0.3)]).
 
 
 %%%%%%% Example of infrastructure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,7 +32,7 @@ node(ap3).
 nodeCap(ap3, hardware, 3).
 nodeCap(ap3, location, eu).
 nodeCap(ap3, security, [encryptedStorage]).
-nodeCap(ap3, availability, 0.85).
+nodeCap(ap3, availability, 0.9).
 nodeCap(ap3, sustainability, 1).
 
 node(ap4).
@@ -142,7 +148,7 @@ nodeCap(c2, availability, 0.95).
 nodeCap(c2, sustainability, 0.5).
 
 node(c3).
-nodeCap(c2, hardware, 12).
+nodeCap(c3, hardware, 12).
 nodeCap(c3, location, ch).
 nodeCap(c3, security, [antimalware, encryptedStorage, audit]). 
 nodeCap(c3, availability, 0.999).

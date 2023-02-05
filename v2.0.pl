@@ -1,30 +1,30 @@
 :- discontiguous aggregatedListValue/3. 
 :- consult('scenario.pl').
 
-fogCutter(RequestId, BestPortion) :- 
-    setof(C, portion(RequestId, C), Portions),
-    bestPortion(Portions, BestPortion).
+fogCutter(RequestId, (Portion,Profit)) :- 
+    setof(X, portion(RequestId, X), CandidatePortions),
+    bestPortion(CandidatePortions, (Portion,Profit)).
 
-bestPortion(L, (P,Best)) :- 
-    %member((P,Best), L), \+ (member((P1,B1),L), dif(Best,B1), P < P1). 
-    sort(L, Tmp), reverse(Tmp, [(P,Best)|_]).
+bestPortion(CandidatePortions, (Portion,Profit)) :- 
+    member((Portion,Profit), CandidatePortions), 
+    \+ (member((_,HigherProfit), CandidatePortions), Profit < HigherProfit). 
 
-portion(RequestId, (Profit, Portion)) :-
+portion(RequestId, (Portion, Profit)) :-
     request(RequestId, N, MaxNodes, Reqs),      
-    splitRequests(Reqs, NodeReqs, LinkReqs, GlobalReqs),
+    splitRequirements(Reqs, NodeReqs, LinkReqs, GlobalReqs),
     portion(N, MaxNodes, NodeReqs, LinkReqs, GlobalReqs, [N], Portion),
     portionProfit(Portion, Profit).
 
-portionProfit([N|Ns], NewProfit) :-
-    profit(N, Profit),
-    portionProfit(Ns, TmpProfit),
-    NewProfit is TmpProfit + Profit.
+portionProfit([N|Ns], Profit) :-
+    profit(N, N_Profit),
+    portionProfit(Ns, Ns_Profit),
+    Profit is N_Profit + Ns_Profit.
 portionProfit([], 0).
 
-splitRequests([],[],[],[]).
-splitRequests([(P,V)|Rs],[(P,V,Op)|Ns],Ls,Gs) :- capType(P,node,Op), splitRequests(Rs,Ns,Ls,Gs).
-splitRequests([(P,V)|Rs],Ns,[(P,V,Op)|Ls],Gs) :- capType(P,link,Op), splitRequests(Rs,Ns,Ls,Gs).
-splitRequests([(P,V)|Rs],Ns,Ls,[(P,V,Op,Aggr)|Gs]) :- capType(P,node,Op,Aggr), splitRequests(Rs,Ns,Ls,Gs).
+splitRequirements([],[],[],[]).
+splitRequirements([(P,V)|Rs],[(P,V,Op)|Ns],Ls,Gs) :- capType(P,node,Op), splitRequirements(Rs,Ns,Ls,Gs).
+splitRequirements([(P,V)|Rs],Ns,[(P,V,Op)|Ls],Gs) :- capType(P,link,Op), splitRequirements(Rs,Ns,Ls,Gs).
+splitRequirements([(P,V)|Rs],Ns,Ls,[(P,V,Op,Aggr)|Gs]) :- capType(P,node,Op,Aggr), splitRequirements(Rs,Ns,Ls,Gs).
 
 portion(_, _, _, _, GlobalReqs, I, I) :-
     satisfiesGlobalReqs(GlobalReqs, I).
