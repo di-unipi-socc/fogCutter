@@ -1,7 +1,6 @@
 <p><img align="left"  src="https://github.com/di-unipi-socc/fogCutter/blob/main/logo/png/logo-no-background.png?raw=true " width="300"> </p>
-<br>
 
-
+<br></br>
 _A logic programming solution to resource selection in the Cloud-Edge continuum_
 
 FogCutter solves the following problem with a declarative approach:
