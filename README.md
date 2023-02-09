@@ -37,7 +37,7 @@ linkCap(ap2,ap1,latency,10).
 linkCap(ap1,ap2,bandwidth,100). # 100 Mbps
 linkCap(ap2,ap1,bandwidth,100). 
 ```
-- a request from the application operator specifying the requirements for a portion of Cloud-Edge infrastructure made of at most `Max` nodes:
+- a request from the application operator specifying the requirements for a portion of Cloud-Edge infrastructure made of at most `Max` nodes. For instance:
 ```prolog
 % request(ReqId, SourceNode, Max, ReqsList).
 request(req40, ap3, 7, [(hardware,20), (latency,250), (bandwidth,10)]).
@@ -47,7 +47,7 @@ request(req42, ap3, 3, [(hardware,20), (latency,250),(bandwidth,10),(security,[a
 
 ## Query
 
-To determine a Cloud-Edge portion that satisfy a request, simply query the predicate:
+To determine a Cloud-Edge portion that satisfy a request, simply load the `fogcutter.pl` and your input and query the predicate:
 
 ```prolog
 fogCutter(req42,Portion).
