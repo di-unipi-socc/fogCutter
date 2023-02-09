@@ -53,7 +53,7 @@ To determine a Cloud-Edge portion that satisfy a request, simply load the `fogcu
 fogCutter(req42,Portion).
 ```
 
-which, over the knowledge base in `scenarios/smarttraffic.pl`, returns a solution portion and the associated profit:
+which, over the knowledge base in `scenarios/smarttraffic.pl`, returns a solution portion for `req42` above and the associated profit for the infrastructure provider:
 
 ```prolog
 Portion = ([ap3, ap4, c2], 11.75).
