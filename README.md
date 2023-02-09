@@ -1,6 +1,14 @@
 # fogCutter
 _A logic programming solution to resource selection in the Cloud-Edge continuum_
 
+FogCutter solves the following problem with a declarative approach:
+
+
+> Let `N` be a set of heterogeneous nodes of a Cloud-Edge infrastructure managed by an infrastructure provider.
+  Let `p: N -> R` be the function that defines the profit of the infrastructure provider for leasing a node.
+  Let `Req` be a request of resources of an application operator.
+  A solution to the considered resource selection problem is a portion `C = {n1, n2, ... nM}` in `N` that guarantees all requirements in `Req` while maximising the infrastructure provider profit.
+
 # Quick guide
 
 The fogCutter prototype inputs a knowledge base made of:
