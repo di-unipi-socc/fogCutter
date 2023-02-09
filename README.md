@@ -3,7 +3,6 @@ _A logic programming solution to resource selection in the Cloud-Edge continuum_
 
 FogCutter solves the following problem with a declarative approach:
 
-
 > Let `N` be a set of heterogeneous nodes of a Cloud-Edge infrastructure managed by an infrastructure provider.
   Let `p: N -> R` be the function that defines the profit of the infrastructure provider for leasing a node.
   Let `Req` be a request of resources of an application operator.
@@ -11,7 +10,13 @@ FogCutter solves the following problem with a declarative approach:
 
 # Quick guide
 
-The fogCutter prototype inputs a knowledge base made of:
+## Prerequisites
+
+To run FogCutter, simply download and install [SWI-Prolog](https://www.swi-prolog.org/Download.html).
+
+## Knowledge base
+
+The FogCutter prototype inputs a knowledge base made of:
 
 -  *nodes* with their (hardware, location, security, availability, etc.) capabilities and their profit for the infrastructure provider. For instance:
 ```prolog
@@ -33,8 +38,21 @@ linkCap(ap2,ap1,bandwidth,100).
 - a request from the application operator specifying the requirements for a portion of Cloud-Edge infrastructure made of at most `Max` nodes:
 ```prolog
 % request(ReqId, SourceNode, Max, ReqsList).
-request(req42, ap3, 7, [(hardware,20), (latency,250), (bandwidth,10)]).
-request(req42, ap3, 10, [(hardware,20), (latency,250),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,[eu])]).
-request(req42, ap3,3, [(hardware,20), (latency,250),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,[eu]), (availability, 0.85), (sustainability, 0.3)]).
+request(req40, ap3, 7, [(hardware,20), (latency,250), (bandwidth,10)]).
+request(req41, ap3, 10, [(hardware,20), (latency,250),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,[eu])]).
+request(req42, ap3, 3, [(hardware,20), (latency,250),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,[eu]), (availability, 0.85), (sustainability, 0.3)]).
 ```
 
+## Query
+
+To determine a Cloud-Edge portion that satisfy a request, simply query the predicate:
+
+```prolog
+fogCutter(req42,Portion).
+```
+
+which, over the knowledge base in `scenarios/smarttraffic.pl`, returns:
+
+```prolog
+Portion = ([ap3, ap4, c2], 11.75).
+```

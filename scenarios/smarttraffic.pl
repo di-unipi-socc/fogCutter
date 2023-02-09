@@ -2,11 +2,11 @@
 % request( RequestId, SourceNodeId, MaxNodes, HardReqs, SoftReqs)
 
 % Q1
-request(req42, ap3, 7, [(hardware,20), (latency,250), (bandwidth,10)]).
+% request(req42, ap3, 3, [(hardware,20), (latency,250), (bandwidth,10)]).
 % Q2
 % request(req42, ap3, 10, [(hardware,20), (latency,250),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,[eu])]).
 % Q3
-% request(req42, ap3,3, [(hardware,20), (latency,250),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,[eu]), (availability, 0.85), (sustainability, 0.3)]).
+request(req42, ap3,3, [(hardware,20), (latency,250),(bandwidth,10),(security,[antimalware, encryptedStorage]), (location,[eu]), (availability, 0.85), (sustainability, 0.3)]).
 
 
 %%%%%%% Example of infrastructure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
