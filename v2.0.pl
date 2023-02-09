@@ -1,8 +1,10 @@
 :- discontiguous aggregatedListValue/3. 
-:- consult('scenario.pl').
+:- consult('scenarios/smarttraffic.pl').
+:-set_prolog_flag(stack_limit, 256 000 000 000).
+:-set_prolog_flag(last_call_optimisation, true).
 
 fogCutter(RequestId, (Portion,Profit)) :- 
-    setof(X, portion(RequestId, X), CandidatePortions),
+    setof(X, portion(RequestId, X), CandidatePortions), 
     bestPortion(CandidatePortions, (Portion,Profit)).
 
 bestPortion(CandidatePortions, (Portion,Profit)) :- 
@@ -26,8 +28,8 @@ splitRequirements([(P,V)|Rs],[(P,V,Op)|Ns],Ls,Gs) :- capType(P,node,Op), splitRe
 splitRequirements([(P,V)|Rs],Ns,[(P,V,Op)|Ls],Gs) :- capType(P,link,Op), splitRequirements(Rs,Ns,Ls,Gs).
 splitRequirements([(P,V)|Rs],Ns,Ls,[(P,V,Op,Aggr)|Gs]) :- capType(P,node,Op,Aggr), splitRequirements(Rs,Ns,Ls,Gs).
 
-portion(_, _, _, _, GlobalReqs, I, I) :-
-    satisfiesGlobalReqs(GlobalReqs, I).
+portion(_, _, _, _, GlobalReqs, I, P) :-
+    satisfiesGlobalReqs(GlobalReqs, I), sort(I, P).
 portion(N, MaxNodes, NodeReqs, LinkReqs, GlobalReqs, I, NewI) :-
     MaxNodes > 0,
     \+ satisfiesGlobalReqs(GlobalReqs, I),
