@@ -1,5 +1,5 @@
 :- discontiguous aggregatedListValue/3. 
-:- consult('scenarios/smarttraffic.pl').
+:- consult('scenarios/ifogsim2.pl').
 :-set_prolog_flag(stack_limit, 256 000 000 000).
 :-set_prolog_flag(last_call_optimisation, true).
 
@@ -57,17 +57,28 @@ satisfiesNodeReqs(M,[(P,V,Op)|Rs]) :-
 
 satisfiesLinkReqs(_,_,[]).
 satisfiesLinkReqs(M,N,[(P,V,Op)|Rs]) :- 
-    linkCap(M,N,P,Vmn), compareValue(Vmn,Op,V),
+    linkCap2(M,N,P,Vmn), compareValue(Vmn,Op,V),
     satisfiesLinkReqs(M,N,Rs).
 
-%%%%%%% Default definition of requirement properties %%%%%%%%%%%%
-capType(hardware,       node,   smaller,    sum).
+linkCap2(X,Y,latency,NewLat) :-
+    linkCap(X, Z, latency, L), dif(Z,Y),
+    linkCap2(Z, Y, latency, L2), 
+    NewLat is L + L2.
+linkCap2(X, Z, latency, L) :- 
+    linkCap(X, Z, latency, L), writeln('end').
+
+%%%%%%% Default definition of requirement properties (iFogSim rev.) %%%%%%%%%%%%
+capType(mips,           node,   smaller,    sum).
+capType(ram,            node,   smaller,    sum).
+capType(storage,        node,   smaller,    sum).
 capType(availability,   node,   smaller,    product).
 capType(sustainability, node,   smaller,    product).
 capType(security,       node,   supset).
 capType(location,       node,   member).
 capType(latency,        link,   smaller).
-capType(bandwidth,      link,   greater).
+capType(upBw,           node,   greater).
+capType(downBw,         node,   greater).
+
 
 aggregatedListValue([],sum,0).
 aggregatedListValue([],product,1).
