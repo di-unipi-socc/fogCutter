@@ -1,0 +1,21 @@
+[{
+        "latency1": 81.0,
+        "latency2": 172.0,
+        "cpu_c_m1": 1800.0,
+        "userId": 2,
+        "cpu_m1_m3": 4400.0,
+        "cpu_m1_m2": 3000.0,
+        "nw_m1_m2": 700.0,
+        "nw_c_m1": 1600.0,
+        "nw_m1_m3": 900.0,
+        "nwLength": 2000.0,
+        "budget2": 1.86,
+        "appId": "A0",
+        "budget1": 1.6,
+        "mService2": 850,
+        "client": 550,
+        "mService3": 1100,
+        "throughput": 180,
+        "mService1": 650
+    }  
+]
