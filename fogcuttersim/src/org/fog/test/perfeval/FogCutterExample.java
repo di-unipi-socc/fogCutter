@@ -20,7 +20,7 @@ import org.fog.utils.JsonToTopology;
 public class FogCutterExample {
 
     static String ApplicationPath = "fogCutter/Application.json";
-    static String InfraStructurePath = "fogCutter/infrastructure";
+    static String InfraStructurePath = "fogCutter/infrastructure.json";
     private static int Manual = 4; //1 - manual,  2 -Cloud,  3-Edge, 4- MobileEdgewards
 
 
